@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Backend for Spinning Wheel of Death App",
+  "main": "index.js",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.12.14"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voomp/spinning-wheel-of-death-backend.git"
+  },
+  "author": "vamp",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/voomp/spinning-wheel-of-death-backend/issues"
+  },
+  "homepage": "https://github.com/voomp/spinning-wheel-of-death-backend#readme"
+}
