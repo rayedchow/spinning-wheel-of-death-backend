@@ -141,4 +141,57 @@ router.get('/getData', async (req, res) => {
 	}
 });
 
+router.post('/resetStudents', async (req, res) => {
+	try {
+		const { email, classId } = req.body;
+
+		if(!email || !classId) {
+			return res.status(400).json({
+				error: 'Not enough data'
+			});
+		}
+
+		const userAuthentication = await AuthUser.findOne({ email });
+		if(!userAuthentication) {
+			return res.status(400).json({
+				error: 'Not authenticated'
+			});
+		}
+
+		const userData = await UserData.findOne({ userId: userAuthentication._id });
+		if(!userData) {
+			const newUserData = new UserData({
+				userId: userAuthentication._id,
+				classData: []
+			});
+
+			const savedUserData = await newUserData.save();
+			return res.json(savedUserData);
+		}
+
+		const classIndex = userData.classData.findIndex((classObj) => 
+			classObj.classId === classId
+		);
+
+		if(classIndex === -1) {
+			userData.classData.push({
+				classId,
+				removedStudents: []
+			});
+
+			const savedUserData = await userData.save();
+			return res.json(savedUserData);
+		}
+
+		userData.classData[classIndex].removedStudents = [];
+
+		const savedUserData = await userData.save();
+		return res.json(savedUserData);
+
+	} catch(err) {
+		console.error(err);
+		res.status(500).send();
+	}
+});
+
 module.exports = router;
