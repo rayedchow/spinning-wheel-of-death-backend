@@ -8,14 +8,14 @@ router.post('/removeStudent', async (req, res) => {
 
 		if(!email || !classId || !studentId) {
 			return res.status(400).json({
-				error: 'Not Enough Data'
+				error: 'Not enough data'
 			});
 		}
 
 		const userAuthentication = await AuthUser.findOne({ email });
 		if(!userAuthentication) {
 			return res.status(400).json({
-				error: 'Not Authenticated'
+				error: 'Not authenticated'
 			});
 		}
 
@@ -38,10 +38,102 @@ router.post('/removeStudent', async (req, res) => {
 			classObj.classId === classId
 		);
 
+		if(classIndex === -1) {
+			userData.classData.push({
+				classId,
+				removedStudents: [studentId]
+			});
+
+			const savedUserData = await userData.save();
+			return res.json(savedUserData);
+		}
+
 		userData.classData[classIndex].removedStudents.push(studentId);
 		const savedUserData = await userData.save();
 
 		return res.json(savedUserData);
+
+	} catch(err) {
+		console.error(err);
+		res.status(500).send();
+	}
+});
+
+router.post('/addStudent', async (req, res) => {
+	try {
+		const { email, classId, studentId } = req.body;
+
+		if(!email || !classId || !studentId) {
+			return res.status(400).json({
+				error: 'Not enough data'
+			});
+		}
+
+		const userAuthentication = await AuthUser.findOne({ email });
+		if(!userAuthentication) {
+			return res.status(400).json({
+				error: 'Not authenticated'
+			});
+		}
+
+		const userData = await UserData.findOne({ userId: userAuthentication._id });
+		if(!userData) {
+			return res.status(400).json({
+				error: 'Student already added'
+			});
+		}
+		
+		const classIndex = userData.classData.findIndex((classObj) => 
+			classObj.classId === classId
+		);
+
+		const studentIndex = userData.classData[classIndex].removedStudents.indexOf(studentId);
+		if(studentIndex === -1) {
+			return res.status(400).json({
+				error: 'Student already added'
+			});
+		}
+
+		userData.classData[classIndex].removedStudents.splice(studentIndex, 1);
+		const savedUserData = await userData.save();
+
+		return res.json(savedUserData);
+
+	} catch(err) {
+		console.error(err);
+		res.status(500).send();
+	}	
+});
+
+router.get('/getData', async (req, res) => {
+	try {
+		const { email } = req.body;
+
+		if(!email) {
+			return res.status(400).json({
+				error: 'Not enough data'
+			});
+		}
+
+		const userAuthentication = await AuthUser.findOne({ email });
+		if(!userAuthentication) {
+			return res.status(400).json({
+				error: 'Not authenticated'
+			});
+		}
+
+		const userData = await UserData.findOne({ userId: userAuthentication._id });
+		if(!userData) {
+			const newUserData = new UserData({
+				userId: userAuthentication._id,
+				classData: []
+			});
+
+			const savedUserData = await newUserData.save();
+			return res.json(savedUserData);
+		}
+
+		return res.json(userData);
 
 	} catch(err) {
 		console.error(err);
