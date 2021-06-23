@@ -14,6 +14,7 @@ router.post('/removeStudent', async (req, res) => {
 
 		const userAuthentication = await AuthUser.findOne({ email });
 		if(!userAuthentication) {
+			console.log('err 2');
 			return res.status(400).json({
 				error: 'Not authenticated'
 			});
@@ -105,7 +106,7 @@ router.post('/addStudent', async (req, res) => {
 	}	
 });
 
-router.get('/getData', async (req, res) => {
+router.post('/getData', async (req, res) => {
 	try {
 		const { email } = req.body;
 
