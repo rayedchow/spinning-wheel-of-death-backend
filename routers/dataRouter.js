@@ -14,7 +14,6 @@ router.post('/removeStudent', async (req, res) => {
 
 		const userAuthentication = await AuthUser.findOne({ email });
 		if(!userAuthentication) {
-			console.log('err 2');
 			return res.status(400).json({
 				error: 'Not authenticated'
 			});
